@@ -1,8 +1,9 @@
 from uuid import uuid4
 
-from fastapi import FastAPI, HTTPException, status
+from fastapi import FastAPI, status
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
+
 
 app = FastAPI()
 
@@ -36,3 +37,19 @@ def create_task(payload: TaskCreate):
     tasks.append(task)
     return task
 
+class Bookin(BaseModel):
+    book: str
+
+
+book: str = ""
+
+
+@app.get('/book', response_model=str)
+def get_books():
+    return f"Любимая книга: {book}"
+
+@app.post('/books', status_code=status.HTTP_201_CREATED)
+def post_books(payload: Bookin):
+    global book
+    book = payload.book
+    return {'message': 'Книга сохранена', 'book': book}
