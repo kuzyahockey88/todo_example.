@@ -1,5 +1,8 @@
+from typing import Optional
+
 from sqlalchemy import select
 from sqlalchemy.orm import Session
+
 from models.category import CategoryORM
 
 
@@ -8,9 +11,9 @@ class CategoryRepository:
         self.db = db
 
     def get_all_category(self) -> list[CategoryORM]:
-        return self.db.scalars(select(CategoryORM)).all()
+        return list(self.db.scalars(select(CategoryORM)).all())
 
-    def get_id_category(self, category_id: str) -> CategoryORM:
+    def get_id_category(self, category_id: str) -> Optional[CategoryORM]:
         return self.db.get(CategoryORM, category_id)
 
     def create_category(self, name: str) -> CategoryORM:
@@ -18,5 +21,5 @@ class CategoryRepository:
         self.db.add(new_category)
         return new_category
 
-    def delete_category(self, CategoryORM):
-        self.db.delete(CategoryORM)
+    def delete_category(self, category: CategoryORM) -> None:
+        self.db.delete(category)

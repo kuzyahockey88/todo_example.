@@ -1,5 +1,6 @@
 import logging
 from time import perf_counter
+
 from fastapi import FastAPI, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -20,6 +21,7 @@ app.add_middleware(
     allow_headers=["*"],
     allow_credentials=True,
 )
+
 
 @app.middleware("http")
 async def log_requests(request: Request, call_next) -> Response:
@@ -50,16 +52,13 @@ async def log_requests(request: Request, call_next) -> Response:
     )
     return response
 
+
 @app.get("/stats")
 def get_stats():
     return {"total_requests": request_counter}
 
+
 app.include_router(api_router)
-
-
-
-
-
 
 
 # app = FastAPI()

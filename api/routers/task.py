@@ -1,36 +1,43 @@
-from fastapi import APIRouter, status, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, status
 
 from api.dependencies import get_task_service
 from schemas.task import TaskCreateSchema, TaskSchema, TaskUpdateSchema
-from services.task import TaskService, TaskNotFound
+from services.task import TaskNotFound, TaskService
 
-router = APIRouter (prefix="/tasks")
+router = APIRouter(prefix="/tasks")
 
-@router.get('')
-def get_tasks(task_service: TaskService = Depends(get_task_service)) -> list[TaskSchema]:
+
+@router.get("")
+def get_tasks(
+    task_service: TaskService = Depends(get_task_service),
+) -> list[TaskSchema]:
     return task_service.list_task()
 
-@router.post('', status_code=status.HTTP_201_CREATED)
+
+@router.post("", status_code=status.HTTP_201_CREATED)
 def create_task(
-    payload: TaskCreateSchema,
-    task_service: TaskService = Depends(get_task_service)) -> TaskSchema:
+    payload: TaskCreateSchema, task_service: TaskService = Depends(get_task_service)
+) -> TaskSchema:
     return task_service.create_task(task_create=payload)
 
-@router.patch('/{task_id}')
+
+@router.patch("/{task_id}")
 def update_tasks(
     task_id: str,
     payload: TaskUpdateSchema,
-    task_service: TaskService = Depends(get_task_service)
+    task_service: TaskService = Depends(get_task_service),
 ) -> TaskSchema:
     try:
         return task_service.update_task(task_id=task_id, task_update=payload)
     except TaskNotFound:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
 
-@router.delete('/{task_id}', status_code=status.HTTP_204_NO_CONTENT)
-def delete_tasks(task_id: str, task_service: TaskService = Depends(get_task_service)) -> None:
+
+@router.delete("/{task_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_tasks(
+    task_id: str, task_service: TaskService = Depends(get_task_service)
+) -> None:
     try:
         return task_service.delete_task(task_id=task_id)
     except TaskNotFound:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
-
